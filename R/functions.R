@@ -2,6 +2,7 @@ phylo_lm_util <- function(formula, data, tree, model, method, boot = 0, ...) {
   dots <- list(...)
   dots_glm <- dots[names(dots) %in% names(formals(phylolm::phyloglm))]
   dots_lm <- dots[names(dots) %in% names(formals(phylolm::phylolm))]
+
   if (length(union(names(dots_glm), names(dots_lm))) != length(dots)) {
     warning("Some arguments in ... are not recognized.", call. = FALSE)
   }
