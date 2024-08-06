@@ -60,5 +60,4 @@ summ1<-hiDsummary(p)
 bestmodel<-rownames(summ1)[which.min(summ1$delta_CICc)]
 hits<-c(hits, bestmodel)
 }
-write.csv(as.matrix(hits), file = paste0("testresults_",ntaxa,"sp_",dim_x2,"p.csv")
-
+write.csv(as.matrix(hits), file = paste0("testresults_",ntaxa,"sp_",dim_x2,"p.csv"))
