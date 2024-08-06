@@ -3,7 +3,7 @@ Type: Package
 Title: High Dimensional Phylogenetic Path Analysis
 Version: 0.1.1
 Author: Ryan Felice
-Maintainer: ryan.felice@ucl.ac.uk
+Maintainer: Ryan Felice <ryan.felice@ucl.ac.uk>
 Description: this is a prototype modifying the phylopath package to accomodate multivariate response and predictor variables
 License: What license is it under?
 Encoding: UTF-8
