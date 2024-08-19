@@ -1,4 +1,6 @@
-phylo_lm_util <- function(formula, data, tree, model, method, boot = 0, ...) {
+
+
+phylo_lm_util <- function(formula, data, tree, model, method, n.mvmorph.cores, boot = 0, ...) {
   dots <- list(...)
   dots_glm <- dots[names(dots) %in% names(formals(phylolm::phyloglm))]
   dots_lm <- dots[names(dots) %in% names(formals(phylolm::phylolm))]
@@ -24,7 +26,8 @@ phylo_lm_util <- function(formula, data, tree, model, method, boot = 0, ...) {
     else {
       res.temp <- mvMORPH::mvgls(formula = formula, data = data, tree = tree, model = model, method=c("PL-LOOCV") ,REML=TRUE)
       fun <- mvMORPH::manova.gls
-      args <- c(list(object = res.temp, test="Pillai",nperm=1000))
+      #TODO: add a check that n.mvmorph.cores is a positive integer
+      args <- c(list(object = res.temp, test="Pillai", nbcores=n.mvmorph.cores, type = "I", nperm=1000))
 
     }
   }
@@ -42,9 +45,9 @@ phylo_lm_util <- function(formula, data, tree, model, method, boot = 0, ...) {
 get_p2 <- function(m) {
   p <- switch(
     class(m),
-    phylolm = stats::coef(phylolm::summary.phylolm(m))[, 'p.value'] %>% last(),
-    phyloglm = stats::coef(phylolm::summary.phyloglm(m))[, 'p.value'] %>% last(),
-    manova.mvgls = m$pvalue[1]
+    phylolm = stats::coef(phylolm::summary.phylolm(m))[, 'p.value'] %>% dplyr::last(),
+    phyloglm = stats::coef(phylolm::summary.phyloglm(m))[, 'p.value'] %>% dplyr::last(),
+    manova.mvgls = m$pvalue %>% dplyr::last()
   )
   if (p < .Machine$double.eps) p <- .Machine$double.eps
   return(p)
@@ -79,7 +82,7 @@ hiDsummary <- function(object, ...) {
   return(d)
 }
 
-HiDPPA <- function(model_set, data, tree, model = 'lambda', method = 'logistic_MPLE',
+HiDPPA <- function(model_set, data, tree, model = 'lambda', method = 'logistic_MPLE', n.mvmorph.cores = 1,
                    order = NULL, parallel = NULL, na.rm = TRUE, ...) {
 
   ###TODO: add a check for these model types
@@ -109,7 +112,7 @@ HiDPPA <- function(model_set, data, tree, model = 'lambda', method = 'logistic_M
   dsep_models_runs <- pbapply::pblapply(
     f_list,
     function(x, data, tree, model, method, ...) {
-      phylo_lm_util(x, data, tree, model, method, ...)
+      phylo_lm_util(x, data, tree, model, method, n.mvmorph.cores, ...)
     },
     data = data, tree = tree, model = model, method = method, cl = cl)
   # Produce appropriate error if needed
